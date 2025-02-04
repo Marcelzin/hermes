@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <ul>
+                <li class="active form_1_progessbar">
+                    <div>
+                        <p>1</p>
+                    </div>
+                </li>
+                <li class="form_2_progessbar">
+                    <div>
+                        <p>2</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="form_wrap">
+            <div class="form_1 data_info">
+                <h2>Cadastro de Comércio</h2>
+                <form id="form1">
+                    <div class="form_container">
+                        <div class="input_wrap">
+                            <label for="nomeComercio">Nome do comércio</label>
+                            <input type="text" name="nomeComercio" class="input" id="nomeComercio" required>
+                        </div>
+                        <div class="input_wrap">
+                            <label for="cpfCnpj">CPF ou CNPJ</label>
+                            <input type="text" name="cpfCnpj" class="input" id="cpfCnpj" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="form_2 data_info" style="display: none;">
+                <h2>Cadastro de Usuário</h2>
+                <form id="form2">
+                    <div class="form_container">
+                        <div class="input_wrap">
+                            <label for="nomeCompleto">Nome completo</label>
+                            <input type="text" name="nomeCompleto" class="input" id="nomeCompleto" required>
+                        </div>
+                        <div class="input_wrap">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" class="input" id="email" required>
+                        </div>
+                        <div class="input_wrap">
+                            <label for="senha">Senha</label>
+                            <input type="password" name="senha" class="input" id="senha" required>
+                        </div>
+                        <div class="input_wrap">
+                            <label for="repetirSenha">Repetir Senha</label>
+                            <input type="password" name="repetirSenha" class="input" id="repetirSenha" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="btns_wrap">
+            <div class="common_btns form_1_btns">
+                <button type="button" class="btn_next">Next <span class="icon"><ion-icon name="arrow-forward-sharp"></ion-icon></span></button>
+            </div>
+            <div class="common_btns form_2_btns" style="display: none;">
+                <button type="button" class="btn_back"><span class="icon"><ion-icon name="arrow-back-sharp"></ion-icon></span>Back</button>
+                <button type="button" class="btn_done">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal_wrapper">
+        <div class="shadow"></div>
+        <div class="success_wrap">
+            <span class="modal_icon"><ion-icon name="checkmark-sharp"></ion-icon></span>
+            <p>Processo de cadastro concluído com sucesso!</p>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../static/js/script.js"></script>
+</body>
+
+</html>

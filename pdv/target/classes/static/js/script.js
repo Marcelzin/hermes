@@ -1,3 +1,5 @@
+// Frontend 
+
 $(document).ready(function() {
     const $form1 = $(".form_1");
     const $form2 = $(".form_2");
@@ -9,19 +11,6 @@ $(document).ready(function() {
     const $form2BackBtn = $(".form_2_btns .btn_back");
 
     const $form2ProgressBar = $(".form_2_progessbar");
-
-    const $btnDone = $(".btn_done");
-    const $modalWrapper = $(".modal_wrapper");
-    const $shadow = $(".shadow");
-
-    // Apply mask to CPF/CNPJ field
-    $('#cpfCnpj').mask('000.000.000-00', {
-        onKeyPress: function (cpfCnpj, e, field, options) {
-            const masks = ['000.000.000-00', '00.000.000/0000-00'];
-            const mask = (cpfCnpj.length > 14) ? masks[1] : masks[0];
-            $('#cpfCnpj').mask(mask, options);
-        }
-    });
 
     $form1NextBtn.on("click", function() {
         $form1.hide();
@@ -43,64 +32,36 @@ $(document).ready(function() {
         $form2ProgressBar.removeClass("active");
     });
 
-    $btnDone.on("click", function() {
-        if (validateForm()) {
-            const formData = {
-                nomeComercio: $('#nomeComercio').val(),
-                cpfCnpj: $('#cpfCnpj').val(),
-                nomeCompleto: $('#nomeCompleto').val(),
-                email: $('#email').val(),
-                senha: $('#senha').val()
-            };
-
-            $.ajax({
-                url: '/your-endpoint-url',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(formData),
-                success: function(response) {
-                    $modalWrapper.addClass("active");
-                },
-                error: function(error) {
-                    alert('Erro ao enviar os dados. Tente novamente.');
-                }
-            });
-        }
-    });
-
-    $shadow.on("click", function() {
-        $modalWrapper.removeClass("active");
-    });
-
-    function validateForm() {
-        const cpfCnpj = $('#cpfCnpj').val();
-        const email = $('#email').val();
-        const senha = $('#senha').val();
-        const repetirSenha = $('#repetirSenha').val();
-
-        const cpfCnpjPattern = /(^\d{3}\.\d{3}\.\d{3}-\d{2}$)|(^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$)/;
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!cpfCnpjPattern.test(cpfCnpj)) {
-            alert('CPF ou CNPJ inválido.');
-            return false;
-        }
-
-        if (!emailPattern.test(email)) {
-            alert('Email inválido.');
-            return false;
-        }
-
-        if (senha.length < 8) {
-            alert('A senha deve ter pelo menos 8 caracteres.');
-            return false;
-        }
-
-        if (senha !== repetirSenha) {
-            alert('As senhas não coincidem.');
-            return false;
-        }
-
-        return true;
-    }
 });
+
+// Validações
+
+// Mascara CPF/CNPJ
+document.addEventListener("DOMContentLoaded", function () {
+    // Seletor para o campo de CPF/CNPJ
+    const cpfCnpj2 = document.getElementById("cpfCnpj");
+
+    // Aplicar a máscara usando o Inputmask
+    $(cpfCnpj2).inputmask({
+        mask: ['999.999.999-99', '99.999.999/9999-99'],
+        keepStatic: true,
+        clearIncomplete: true,
+    });
+});
+
+
+const next_btn = document.getElementsByClassName("btn_next");
+const nomeComercio = document.getElementById("nomeComercio");
+const cpfCnpj = document.getElementById("cpfCnpj");
+
+
+
+/* btn_next
+nomeComercio não pode ser vazio, deve ter no máximo 120 caracteres
+cpfCnpj - não pode ser vazio
+nomeCompleto - não pode ser vazio, no máximo 120 caracteres
+email - não pode ser vazio, deve ser padrão email
+senha - não pode ser vazio, deve ter no minimo 8 caracteres
+repetirSenha - deve ser igual a senha anterior */
+
+// Requisições

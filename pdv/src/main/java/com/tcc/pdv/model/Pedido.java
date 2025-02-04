@@ -37,5 +37,64 @@ public class Pedido {
     @JoinColumn(name = "comercio_id")
     private Comercio comercio;
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Date getDataPedido() {
+		return dataPedido;
+	}
+
+	public void setDataPedido(Date dataPedido) {
+		this.dataPedido = dataPedido;
+	}
+
+	public double getValorTotal() {
+		return valorTotal;
+	}
+
+	public void setValorTotal(double valorTotal) {
+		this.valorTotal = valorTotal;
+	}
+
+	public double getLucroObtido() {
+		return lucroObtido;
+	}
+
+	public void setLucroObtido(double lucroObtido) {
+		this.lucroObtido = lucroObtido;
+	}
+
+	public Usuario getResponsavel() {
+		return responsavel;
+	}
+
+	public void setResponsavel(Usuario responsavel) {
+		this.responsavel = responsavel;
+	}
+
+	public FormaPagamento getPagamento() {
+		return pagamento;
+	}
+
+	public void setPagamento(FormaPagamento pagamento) {
+		this.pagamento = pagamento;
+	}
+
+	public Comercio getComercio() {
+		return comercio;
+	}
+
+	public void setComercio(Comercio comercio) {
+		this.comercio = comercio;
+	}
+
     // Getters and Setters
+    
+    
+    
 }

@@ -21,14 +21,30 @@ public class Comercio {
     @Column(name = "cpf_cnpj")
     private String cpfCnpj;
 
-    @OneToMany(mappedBy = "comercio")
-    private List<Usuario> usuarios;
-
-    @OneToMany(mappedBy = "comercio")
-    private List<Produto> produtos;
-
-    @OneToMany(mappedBy = "comercio")
-    private List<Pedido> pedidos;
-
     // Getters and Setters
+    
+    public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public String getCpfCnpj() {
+		return cpfCnpj;
+	}
+
+	public void setCpfCnpj(String cpfCnpj) {
+		this.cpfCnpj = cpfCnpj;
+	}
+    
 }

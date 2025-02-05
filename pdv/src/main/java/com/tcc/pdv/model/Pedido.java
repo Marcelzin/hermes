@@ -93,7 +93,7 @@ public class Pedido {
 		this.comercio = comercio;
 	}
 
-    // Getters and Setters
+    
     
     
     

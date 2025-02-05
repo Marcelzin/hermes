@@ -19,7 +19,7 @@ public class Usuario {
     @JoinColumn(name = "comercio_id")
     private Comercio comercio;
 
-    // Getters and Setters
+    
     public int getId() {
         return id;
     }

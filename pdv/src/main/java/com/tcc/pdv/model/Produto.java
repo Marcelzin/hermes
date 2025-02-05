@@ -96,7 +96,7 @@ public class Produto {
 		this.status = status;
 	}
 
-    // Getters and Setters
+    
     
     
     

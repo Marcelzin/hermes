@@ -3,9 +3,12 @@ package com.tcc.pdv.controller;
 import com.tcc.pdv.model.Comercio;
 import com.tcc.pdv.repository.ComercioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comercios")
@@ -20,8 +23,11 @@ public class ComercioController {
     }
 
     @PostMapping
-    public Comercio createComercio(@RequestBody Comercio comercio) {
-        return comercioRepository.save(comercio);
+    public ResponseEntity<Map<String, Object>> createComercio(@RequestBody Comercio comercio) {
+        Comercio savedComercio = comercioRepository.save(comercio);
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", savedComercio.getId());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

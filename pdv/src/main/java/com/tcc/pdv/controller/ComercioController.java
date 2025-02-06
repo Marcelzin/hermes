@@ -3,6 +3,7 @@ package com.tcc.pdv.controller;
 import com.tcc.pdv.model.Comercio;
 import com.tcc.pdv.repository.ComercioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,15 @@ public class ComercioController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createComercio(@RequestBody Comercio comercio) {
+        String cpfCnpj = comercio.getCpfCnpj();
+        List<Comercio> comerciosExistentes = comercioRepository.findByCpfCnpj(cpfCnpj);
+
+        if (!comerciosExistentes.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "CPF ou CNPJ já cadastrado");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
         Comercio savedComercio = comercioRepository.save(comercio);
         Map<String, Object> response = new HashMap<>();
         response.put("id", savedComercio.getId());

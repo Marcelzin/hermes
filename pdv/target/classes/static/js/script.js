@@ -78,11 +78,15 @@ $(document).ready(function () {
                 $progressBar.removeClass("bg-secondary").addClass("bg-success");
                 $progressBarStep2.show();
             },
-            error: function () {
+            error: function (xhr) {
+                let errorMessage = "Ocorreu um erro ao cadastrar o comércio.";
+                if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
                 Swal.fire({
                     icon: "error",
                     title: "Erro",
-                    text: "Ocorreu um erro ao cadastrar o comércio.",
+                    text: errorMessage,
                 });
             }
         });
@@ -117,11 +121,15 @@ $(document).ready(function () {
                     text: "Usuário cadastrado com sucesso!",
                 });
             },
-            error: function () {
+            error: function (xhr) {
+                let errorMessage = "Ocorreu um erro ao cadastrar o usuário.";
+                if (xhr.status === 409) {
+                    errorMessage = "E-mail já cadastrado.";
+                }
                 Swal.fire({
                     icon: "error",
                     title: "Erro",
-                    text: "Ocorreu um erro ao cadastrar o usuário.",
+                    text: errorMessage,
                 });
             }
         });

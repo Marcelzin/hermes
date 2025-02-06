@@ -19,7 +19,6 @@ public class Usuario {
     @JoinColumn(name = "comercio_id")
     private Comercio comercio;
 
-    
     public int getId() {
         return id;
     }

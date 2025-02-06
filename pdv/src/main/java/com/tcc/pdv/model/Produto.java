@@ -1,4 +1,5 @@
 package com.tcc.pdv.model;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,27 +11,27 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class Produto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    private String nome;
+	private String nome;
 
-    @Column(name = "valor_fabrica")
-    private double valorFabrica;
+	@Column(name = "valor_fabrica")
+	private double valorFabrica;
 
-    @Column(name = "valor_venda")
-    private double valorVenda;
+	@Column(name = "valor_venda")
+	private double valorVenda;
 
-    private String descricao;
+	private String descricao;
 
-    private String imagem;
+	private String imagem;
 
-    @ManyToOne
-    @JoinColumn(name = "comercio_id")
-    private Comercio comercio;
+	@ManyToOne
+	@JoinColumn(name = "comercio_id")
+	private Comercio comercio;
 
-    private String status;
+	private String status;
 
 	public int getId() {
 		return id;
@@ -96,8 +97,4 @@ public class Produto {
 		this.status = status;
 	}
 
-    
-    
-    
-    
 }

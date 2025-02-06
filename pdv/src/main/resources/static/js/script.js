@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     const $step1 = $("#step1");
     const $step2 = $("#step2");
     const $nextBtn = $("#nextBtn");
@@ -60,7 +60,7 @@ $(document).ready(function() {
         return true;
     }
 
-    $nextBtn.on("click", function() {
+    $nextBtn.on("click", function () {
         if (!validateStep1()) return;
 
         $.ajax({
@@ -71,14 +71,14 @@ $(document).ready(function() {
                 nome: $("#nomeComercio").val().trim(),
                 cpfCnpj: $("#cpfCnpj").val().trim()
             }),
-            success: function(response) {
+            success: function (response) {
                 comercioId = response.id;
                 $step1.hide();
                 $step2.show();
                 $progressBar.removeClass("bg-secondary").addClass("bg-success");
                 $progressBarStep2.show();
             },
-            error: function() {
+            error: function () {
                 Swal.fire({
                     icon: "error",
                     title: "Erro",
@@ -88,14 +88,14 @@ $(document).ready(function() {
         });
     });
 
-    $backBtn.on("click", function() {
+    $backBtn.on("click", function () {
         $step2.hide();
         $step1.show();
         $progressBar.removeClass("bg-success").addClass("bg-secondary");
         $progressBarStep2.hide();
     });
 
-    $doneBtn.on("click", function() {
+    $doneBtn.on("click", function () {
         if (!validateStep2()) return;
 
         $.ajax({
@@ -110,14 +110,14 @@ $(document).ready(function() {
                 nivelAcesso: "prop",
                 status: "ATIVO"
             }),
-            success: function() {
+            success: function () {
                 Swal.fire({
                     icon: "success",
                     title: "Sucesso",
                     text: "Usuário cadastrado com sucesso!",
                 });
             },
-            error: function() {
+            error: function () {
                 Swal.fire({
                     icon: "error",
                     title: "Erro",

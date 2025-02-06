@@ -9,18 +9,16 @@ import jakarta.persistence.Id;
 @Entity
 public class Comercio {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    private String nome;
+	private String nome;
 
-    @Column(name = "cpf_cnpj")
-    private String cpfCnpj;
+	@Column(name = "cpf_cnpj")
+	private String cpfCnpj;
 
-    
-    
-    public int getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -43,5 +41,5 @@ public class Comercio {
 	public void setCpfCnpj(String cpfCnpj) {
 		this.cpfCnpj = cpfCnpj;
 	}
-    
+
 }

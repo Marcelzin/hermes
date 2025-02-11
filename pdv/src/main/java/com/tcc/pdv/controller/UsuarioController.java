@@ -3,6 +3,10 @@ package com.tcc.pdv.controller;
 import com.tcc.pdv.model.Comercio;
 import com.tcc.pdv.model.Usuario;
 import com.tcc.pdv.repository.UsuarioRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import com.tcc.pdv.repository.ComercioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +67,28 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public Usuario getUsuarioById(@PathVariable int id) {
         return usuarioRepository.findById(id).orElse(null);
+    }
+
+    // Método para login
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> verificarLoginUsuario(@RequestBody Map<String, Object> payload, HttpServletRequest request) {
+        String email = (String) payload.get("email");
+        String senha = (String) payload.get("senha");
+
+        Usuario usuario = usuarioRepository.findByEmail(email);
+        Map<String, Object> response = new HashMap<>();
+        if (usuario == null) {
+            response.put("error", "E-mail não cadastrado.");
+            return ResponseEntity.status(404).body(response);
+        } else if (!passwordEncoder.matches(senha, usuario.getSenha())) {
+            response.put("error", "Senha incorreta.");
+            return ResponseEntity.status(401).body(response);
+        } else {
+            HttpSession session = request.getSession();
+            session.setAttribute("userId", usuario.getId());
+            response.put("message", "Login realizado com sucesso!");
+            return ResponseEntity.ok(response);
+        }
     }
 
     // Método para atualizar um usuário

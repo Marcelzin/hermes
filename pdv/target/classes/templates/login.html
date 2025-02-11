@@ -4,8 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
     <link rel="stylesheet" type="text/css" href="/css/login.css">
+    <script src="/js/login.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
 </head>
 
 <body>
@@ -14,12 +19,12 @@
         <form id="login_form" name="login_form" class="form">
             <label for="email">Email</label>
             <input class="input" type="text" id="email" name="email">
-            <label for="password">Senha</label>
-            <input class="input" type="password" id="password" name="password">
+            <label for="senha">Senha</label>
+            <input class="input" type="senha" id="senha" name="senha">
         </form>
         <div class="btn_div">
             <a class="btn gray" href="../">Voltar</a>
-            <a class="btn">Login</a>
+            <a class="btn" id="btn_login" onclick="login()">Login</a>
         </div>
     </div>
 </body>

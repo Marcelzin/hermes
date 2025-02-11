@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - PDV Hermes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">PDV Hermes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/vendas"><i class="fas fa-shopping-cart"></i> Vendas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/produtos"><i class="fas fa-box"></i> Produtos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/equipe"><i class="fas fa-users"></i> Equipe</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <button class="btn btn-danger" onclick="logoff()"><i class="fas fa-sign-out-alt"></i>
+                        Logoff</button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-primary" onclick="editarUsuario()"><i class="fas fa-user-edit"></i> Editar
+                        Usuário</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="container-fluid">
+            <h1>Bem-vindo ao PDV Hermes</h1>
+            <p>Conteúdo da página...</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function logoff() {
+            // Lógica para fazer logoff
+            window.location.href = "/logout";
+        }
+
+        function editarUsuario() {
+            // Lógica para editar usuário
+            window.location.href = "/editar-usuario";
+        }
+    </script>
+</body>
+
+</html>

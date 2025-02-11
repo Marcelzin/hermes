@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - PDV Hermes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">PDV Hermes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/vendas"><i class="fas fa-shopping-cart"></i> Vendas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/produtos"><i class="fas fa-box"></i> Produtos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/equipe"><i class="fas fa-users"></i> Equipe</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <button class="btn btn-danger" onclick="logoff()"><i class="fas fa-sign-out-alt"></i> Logoff</button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-primary" onclick="editarUsuario()"><i class="fas fa-user-edit"></i> Editar Usuário</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Produtos</h1>
+        <button class="btn btn-success mb-3" data-toggle="modal" data-target="#produtoModal" onclick="limparFormulario()"><i class="fas fa-plus"></i> Adicionar Produto</button>
+        <input type="text" id="filtro" class="form-control mb-3" placeholder="Filtrar produtos...">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Valor de Fábrica</th>
+                    <th>Valor de Venda</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="produtosTable">
+                <!-- Produtos serão carregados aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Produto -->
+    <div class="modal fade" id="produtoModal" tabindex="-1" aria-labelledby="produtoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="produtoModalLabel">Adicionar Produto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="produtoForm">
+                        <input type="hidden" id="produtoId">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="valorFabrica">Valor de Fábrica</label>
+                            <input type="number" class="form-control" id="valorFabrica" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="valorVenda">Valor de Venda</label>
+                            <input type="number" class="form-control" id="valorVenda" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <textarea class="form-control" id="descricao" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="imagem">Imagem</label>
+                            <input type="text" class="form-control" id="imagem">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-control" id="status" required>
+                                <option value="ATIVO">ATIVO</option>
+                                <option value="INATIVO">INATIVO</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function logoff() {
+            window.location.href = "/logout";
+        }
+
+        function editarUsuario() {
+            window.location.href = "/editar-usuario";
+        }
+
+        $(document).ready(function() {
+            carregarProdutos();
+
+            $('#filtro').on('input', function() {
+                var filtro = $(this).val().toLowerCase();
+                $('#produtosTable tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(filtro) > -1);
+                });
+            });
+
+            $('#produtoForm').on('submit', function(event) {
+                event.preventDefault();
+                var produtoId = $('#produtoId').val();
+                var url = produtoId ? '/produtos/' + produtoId : '/produtos';
+                var type = produtoId ? 'PUT' : 'POST';
+
+                $.ajax({
+                    url: url,
+                    type: type,
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: produtoId,
+                        nome: $('#nome').val(),
+                        valorFabrica: $('#valorFabrica').val(),
+                        valorVenda: $('#valorVenda').val(),
+                        descricao: $('#descricao').val(),
+                        imagem: $('#imagem').val(),
+                        status: $('#status').val()
+                    }),
+                    success: function(response) {
+                        $('#produtoModal').modal('hide');
+                        carregarProdutos();
+                    },
+                    error: function(xhr) {
+                        alert('Ocorreu um erro ao salvar o produto.');
+                    }
+                });
+            });
+        });
+
+        function carregarProdutos() {
+            $.ajax({
+                url: '/produtos',
+                type: 'GET',
+                success: function(response) {
+                    var produtosTable = $('#produtosTable');
+                    produtosTable.empty();
+                    response.forEach(function(produto) {
+                        produtosTable.append(`
+                            <tr>
+                                <td>${produto.id}</td>
+                                <td>${produto.nome}</td>
+                                <td>${produto.valorFabrica}</td>
+                                <td>${produto.valorVenda}</td>
+                                <td>${produto.descricao}</td>
+                                <td>${produto.status}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarProduto(${produto.id})"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-danger btn-sm" onclick="desativarProduto(${produto.id})"><i class="fas fa-trash-alt"></i></button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                },
+                error: function(xhr) {
+                    alert('Ocorreu um erro ao carregar os produtos.');
+                }
+            });
+        }
+
+        function editarProduto(id) {
+            $.ajax({
+                url: '/produtos/' + id,
+                type: 'GET',
+                success: function(produto) {
+                    $('#produtoId').val(produto.id);
+                    $('#nome').val(produto.nome);
+                    $('#valorFabrica').val(produto.valorFabrica);
+                    $('#valorVenda').val(produto.valorVenda);
+                    $('#descricao').val(produto.descricao);
+                    $('#imagem').val(produto.imagem);
+                    $('#status').val(produto.status);
+                    $('#produtoModalLabel').text('Editar Produto');
+                    $('#produtoModal').modal('show');
+                },
+                error: function(xhr) {
+                    alert('Ocorreu um erro ao carregar o produto.');
+                }
+            });
+        }
+
+        function desativarProduto(id) {
+            if (confirm('Tem certeza que deseja desativar este produto?')) {
+                $.ajax({
+                    url: '/produtos/' + id,
+                    type: 'DELETE',
+                    success: function() {
+                        carregarProdutos();
+                    },
+                    error: function(xhr) {
+                        alert('Ocorreu um erro ao desativar o produto.');
+                    }
+                });
+            }
+        }
+
+        function limparFormulario() {
+            $('#produtoId').val('');
+            $('#nome').val('');
+            $('#valorFabrica').val('');
+            $('#valorVenda').val('');
+            $('#descricao').val('');
+            $('#imagem').val('');
+            $('#status').val('ATIVO');
+            $('#produtoModalLabel').text('Adicionar Produto');
+        }
+    </script>
+</body>
+</html>

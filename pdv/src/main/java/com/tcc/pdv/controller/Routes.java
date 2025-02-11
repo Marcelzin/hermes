@@ -20,4 +20,19 @@ public class Routes {
     public String showLogin() {
         return "login";
     }
+
+    @GetMapping("/home")
+    public String showHome() {
+        return "home";
+    }
+
+    @GetMapping("/vendas")
+    public String showVendas() {
+        return "vendas";
+    }
+
+    @GetMapping("/equipe")
+    public String showEquipe() {
+        return "equipe";
+    }
 }

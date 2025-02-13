@@ -86,6 +86,7 @@ public class UsuarioController {
         } else {
             HttpSession session = request.getSession();
             session.setAttribute("userId", usuario.getId());
+            session.setAttribute("comercioId", usuario.getComercio().getId());
             response.put("message", "Login realizado com sucesso!");
             return ResponseEntity.ok(response);
         }

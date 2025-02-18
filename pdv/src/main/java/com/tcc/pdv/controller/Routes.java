@@ -1,13 +1,23 @@
 package com.tcc.pdv.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.tcc.pdv.model.Produto;
+import com.tcc.pdv.repository.ProdutoRepository;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.ui.Model;
 
 @Controller
 public class Routes {
+
+    @Autowired
+    public ProdutoRepository produtoRepository;
 
     @GetMapping("")
     public String showIndex() {
@@ -32,6 +42,13 @@ public class Routes {
     @GetMapping("/vendas")
     public String showVendas() {
         return "vendas";
+    }
+
+    @GetMapping("/produtos")
+    public String showProdutos(Model model) {
+        List<Produto> produtos = produtoRepository.findAll();
+        model.addAttribute("produtos", produtos);
+        return "produtos";
     }
 
     @GetMapping("/equipe")

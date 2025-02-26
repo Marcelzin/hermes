@@ -4,6 +4,10 @@ import com.tcc.pdv.model.Comercio;
 import com.tcc.pdv.model.Produto;
 import com.tcc.pdv.repository.ComercioRepository;
 import com.tcc.pdv.repository.ProdutoRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,18 +27,28 @@ public class ProdutoController {
     private ComercioRepository comercioRepository;
 
     @GetMapping
-    public List<Produto> getAllProdutos() {
-        return produtoRepository.findAll();
+    public ResponseEntity<List<Produto>> getAllProdutos(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Integer comercioId = (Integer) session.getAttribute("comercioId");
+
+        if (comercioId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<Produto> produtos = produtoRepository.findByComercioId(comercioId);
+        return ResponseEntity.ok(produtos);
     }
 
     @PostMapping
-    public ResponseEntity<Produto> criarProduto(@RequestBody Map<String, Object> payload) {
-        Integer comercioId = (Integer) payload.get("comercioId");
-        String nome = (String) payload.get("nome");
+    public ResponseEntity<Produto> criarProduto(HttpServletRequest request, @RequestBody Map<String, Object> payload) {
+        HttpSession session = request.getSession(false);
 
-        if (comercioId == null || nome == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+        Integer comercioId = (Integer) session.getAttribute("comercioId");
 
         Comercio comercio = comercioRepository.findById(comercioId).orElse(null);
 
@@ -43,9 +57,12 @@ public class ProdutoController {
         }
 
         Produto produto = new Produto();
-        produto.setNome(nome);
-        produto.setValorFabrica((Double) payload.get("valorFabrica"));
+        produto.setBarra((Integer) payload.get("barra"));
+        produto.setNome((String) payload.get("nome"));
+
+        produto.setValorFabrica((Double) (payload.get("valorFabrica")));
         produto.setValorVenda((Double) payload.get("valorVenda"));
+        
         produto.setDescricao((String) payload.get("descricao"));
         produto.setImagem((String) payload.get("imagem"));
         produto.setStatus((String) payload.get("status"));

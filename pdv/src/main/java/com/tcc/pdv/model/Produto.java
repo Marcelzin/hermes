@@ -23,6 +23,9 @@ public class Produto {
 	@Column(name = "valor_venda")
 	private double valorVenda;
 
+	@Column(name = "barra")
+	private int barra;
+
 	private String descricao;
 
 	private String imagem;
@@ -95,6 +98,14 @@ public class Produto {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public double getBarra() {
+		return barra;
+	}
+
+	public void setBarra(int barra) {
+		this.barra = barra;
 	}
 
 }

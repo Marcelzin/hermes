@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,48 @@ public class ProdutoController {
 
     @Autowired
     private ComercioRepository comercioRepository;
+
+    @GetMapping("/filtro")
+    public ResponseEntity<List<Produto>> filtrarProdutos(
+            @RequestParam(required = false) String barra,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) String imagem,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String valorFabrica,
+            @RequestParam(required = false) String valorVenda) {
+
+        List<Produto> produtos = produtoRepository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (barra != null && !barra.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("barra").as(String.class), "%" + barra + "%"));
+            }
+            if (nome != null && !nome.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("nome"), "%" + nome + "%"));
+            }
+            if (descricao != null && !descricao.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("descricao"), "%" + descricao + "%"));
+            }
+            if (imagem != null && !imagem.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("imagem"), "%" + imagem + "%"));
+            }
+            if (status != null && !status.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+            if (valorFabrica != null && !valorFabrica.isEmpty()) {
+                predicates
+                        .add(criteriaBuilder.like(root.get("valorFabrica").as(String.class), "%" + valorFabrica + "%"));
+            }
+            if (valorVenda != null && !valorVenda.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("valorVenda").as(String.class), "%" + valorVenda + "%"));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+
+        return ResponseEntity.ok(produtos);
+    }
 
     @GetMapping
     public ResponseEntity<List<Produto>> getAllProdutos(HttpServletRequest request) {
@@ -57,12 +101,12 @@ public class ProdutoController {
         }
 
         Produto produto = new Produto();
-        produto.setBarra((Integer) payload.get("barra"));
+        produto.setBarra((Long) payload.get("barra"));
         produto.setNome((String) payload.get("nome"));
 
         produto.setValorFabrica((Double) (payload.get("valorFabrica")));
         produto.setValorVenda((Double) payload.get("valorVenda"));
-        
+
         produto.setDescricao((String) payload.get("descricao"));
         produto.setImagem((String) payload.get("imagem"));
         produto.setStatus((String) payload.get("status"));
@@ -78,7 +122,11 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Produto> atualizarProduto(@PathVariable int id, @RequestBody Produto produtoDetails) {
+    public ResponseEntity<Produto> atualizarProduto(HttpServletRequest request, @PathVariable int id,
+            @RequestBody Produto produtoDetails) {
+        HttpSession session = request.getSession(false);
+        Integer comercioId = (Integer) session.getAttribute("comercioId");
+
         Produto produto = produtoRepository.findById(id).orElse(null);
         if (produto != null) {
             produto.setNome(produtoDetails.getNome());
@@ -87,8 +135,9 @@ public class ProdutoController {
             produto.setDescricao(produtoDetails.getDescricao());
             produto.setImagem(produtoDetails.getImagem());
             produto.setStatus(produtoDetails.getStatus());
-            Comercio comercio = comercioRepository.findById(produtoDetails.getComercio().getId()).orElse(null);
-            if (comercio != null) {
+            Comercio comercio = comercioRepository.findById(comercioId).orElse(null);
+
+            if (comercio == null) {
                 produto.setComercio(comercio);
             }
             Produto produtoAtualizado = produtoRepository.save(produto);

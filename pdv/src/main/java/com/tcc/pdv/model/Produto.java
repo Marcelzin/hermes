@@ -7,105 +7,107 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Digits;
 
 @Entity
 public class Produto {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-	private String nome;
+    private String nome;
 
-	@Column(name = "valor_fabrica")
-	private double valorFabrica;
+    @Column(name = "valor_fabrica", columnDefinition = "DECIMAL(10, 2) DEFAULT '0.00'")
+    @Digits(integer = 8, fraction = 2)
+    private double valorFabrica;
 
-	@Column(name = "valor_venda")
-	private double valorVenda;
+    @Column(name = "valor_venda", columnDefinition = "DECIMAL(10, 2) DEFAULT '0.00'")
+    @Digits(integer = 8, fraction = 2)
+    private double valorVenda;
 
-	@Column(name = "barra")
-	private int barra;
+    @Column(name = "barra")
+    private long barra;
 
-	private String descricao;
+    private String descricao;
 
-	private String imagem;
+    private String imagem;
 
-	@ManyToOne
-	@JoinColumn(name = "comercio_id")
-	private Comercio comercio;
+    @ManyToOne
+    @JoinColumn(name = "comercio_id")
+    private Comercio comercio;
 
-	private String status;
+    private String status;
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getNome() {
-		return nome;
-	}
+    public String getNome() {
+        return nome;
+    }
 
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-	public double getValorFabrica() {
-		return valorFabrica;
-	}
+    public double getValorFabrica() {
+        return valorFabrica;
+    }
 
-	public void setValorFabrica(double valorFabrica) {
-		this.valorFabrica = valorFabrica;
-	}
+    public void setValorFabrica(double valorFabrica) {
+        this.valorFabrica = valorFabrica;
+    }
 
-	public double getValorVenda() {
-		return valorVenda;
-	}
+    public double getValorVenda() {
+        return valorVenda;
+    }
 
-	public void setValorVenda(double valorVenda) {
-		this.valorVenda = valorVenda;
-	}
+    public void setValorVenda(double valorVenda) {
+        this.valorVenda = valorVenda;
+    }
 
-	public String getDescricao() {
-		return descricao;
-	}
+    public String getDescricao() {
+        return descricao;
+    }
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
 
-	public String getImagem() {
-		return imagem;
-	}
+    public String getImagem() {
+        return imagem;
+    }
 
-	public void setImagem(String imagem) {
-		this.imagem = imagem;
-	}
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
 
-	public Comercio getComercio() {
-		return comercio;
-	}
+    public Comercio getComercio() {
+        return comercio;
+    }
 
-	public void setComercio(Comercio comercio) {
-		this.comercio = comercio;
-	}
+    public void setComercio(Comercio comercio) {
+        this.comercio = comercio;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public double getBarra() {
-		return barra;
-	}
+    public long getBarra() {
+        return barra;
+    }
 
-	public void setBarra(int barra) {
-		this.barra = barra;
-	}
-
+    public void setBarra(long barra) {
+        this.barra = barra;
+    }
 }

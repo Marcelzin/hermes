@@ -57,8 +57,7 @@ public class ProdutoController {
                 predicates.add(criteriaBuilder.equal(root.get("status"), status));
             }
             if (valorFabrica != null && !valorFabrica.isEmpty()) {
-                predicates
-                        .add(criteriaBuilder.like(root.get("valorFabrica").as(String.class), "%" + valorFabrica + "%"));
+                predicates.add(criteriaBuilder.like(root.get("valorFabrica").as(String.class), "%" + valorFabrica + "%"));
             }
             if (valorVenda != null && !valorVenda.isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("valorVenda").as(String.class), "%" + valorVenda + "%"));
@@ -101,15 +100,7 @@ public class ProdutoController {
         }
 
         Produto produto = new Produto();
-        produto.setBarra((Long) payload.get("barra"));
-        produto.setNome((String) payload.get("nome"));
-
-        produto.setValorFabrica((Double) (payload.get("valorFabrica")));
-        produto.setValorVenda((Double) payload.get("valorVenda"));
-
-        produto.setDescricao((String) payload.get("descricao"));
-        produto.setImagem((String) payload.get("imagem"));
-        produto.setStatus((String) payload.get("status"));
+        setProdutoFields(produto, payload);
         produto.setComercio(comercio);
 
         Produto savedProduto = produtoRepository.save(produto);
@@ -117,8 +108,10 @@ public class ProdutoController {
     }
 
     @GetMapping("/{id}")
-    public Produto getProdutoById(@PathVariable int id) {
-        return produtoRepository.findById(id).orElse(null);
+    public ResponseEntity<Produto> getProdutoById(@PathVariable int id) {
+        return produtoRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
@@ -127,33 +120,69 @@ public class ProdutoController {
         HttpSession session = request.getSession(false);
         Integer comercioId = (Integer) session.getAttribute("comercioId");
 
-        Produto produto = produtoRepository.findById(id).orElse(null);
-        if (produto != null) {
-            produto.setNome(produtoDetails.getNome());
-            produto.setValorFabrica(produtoDetails.getValorFabrica());
-            produto.setValorVenda(produtoDetails.getValorVenda());
-            produto.setDescricao(produtoDetails.getDescricao());
-            produto.setImagem(produtoDetails.getImagem());
-            produto.setStatus(produtoDetails.getStatus());
-            Comercio comercio = comercioRepository.findById(comercioId).orElse(null);
-
-            if (comercio == null) {
-                produto.setComercio(comercio);
-            }
-            Produto produtoAtualizado = produtoRepository.save(produto);
-            return ResponseEntity.ok(produtoAtualizado);
-        }
-        return ResponseEntity.notFound().build();
+        return produtoRepository.findById(id)
+                .map(produto -> {
+                    setProdutoFields(produto, produtoDetails);
+                    Comercio comercio = comercioRepository.findById(comercioId).orElse(null);
+                    produto.setComercio(comercio);
+                    Produto produtoAtualizado = produtoRepository.save(produto);
+                    return ResponseEntity.ok(produtoAtualizado);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desativarProduto(@PathVariable int id) {
-        Produto produto = produtoRepository.findById(id).orElse(null);
-        if (produto != null) {
-            produto.setStatus("INATIVO");
-            produtoRepository.save(produto);
-            return ResponseEntity.ok().build();
+    public ResponseEntity<Object> desativarProduto(@PathVariable int id) {
+        return produtoRepository.findById(id)
+                .map(produto -> {
+                    produto.setStatus("INATIVO");
+                    produtoRepository.save(produto);
+                    return ResponseEntity.ok().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    private void setProdutoFields(Produto produto, Map<String, Object> payload) {
+        Object barraValue = payload.get("barra");
+        if (barraValue instanceof Integer) {
+            produto.setBarra(((Integer) barraValue).longValue());
+        } else if (barraValue instanceof Long) {
+            produto.setBarra((Long) barraValue);
+        } else {
+            throw new IllegalArgumentException("Invalid type for barra");
         }
-        return ResponseEntity.notFound().build();
+        produto.setNome((String) payload.get("nome"));
+        produto.setValorFabrica(formatToTwoDecimalPlaces(convertToDouble(payload.get("valorFabrica"))));
+        produto.setValorVenda(formatToTwoDecimalPlaces(convertToDouble(payload.get("valorVenda"))));
+        produto.setDescricao((String) payload.get("descricao"));
+        produto.setImagem((String) payload.get("imagem"));
+        produto.setStatus((String) payload.get("status"));
+    }
+
+    private void setProdutoFields(Produto produto, Produto produtoDetails) {
+        produto.setBarra(produtoDetails.getBarra());
+        produto.setNome(produtoDetails.getNome());
+        produto.setValorFabrica(formatToTwoDecimalPlaces(produtoDetails.getValorFabrica()));
+        produto.setValorVenda(formatToTwoDecimalPlaces(produtoDetails.getValorVenda()));
+        produto.setDescricao(produtoDetails.getDescricao());
+        produto.setImagem(produtoDetails.getImagem());
+        produto.setStatus(produtoDetails.getStatus());
+    }
+
+    private Double convertToDouble(Object value) {
+        if (value instanceof Integer) {
+            return ((Integer) value).doubleValue();
+        } else if (value instanceof Double) {
+            return (Double) value;
+        } else {
+            throw new IllegalArgumentException("Invalid type for value");
+        }
+    }
+
+    private Double formatToTwoDecimalPlaces(Double value) {
+        if (value == null) {
+            return null;
+        }
+        return Math.round(value * 100.0) / 100.0;
     }
 }

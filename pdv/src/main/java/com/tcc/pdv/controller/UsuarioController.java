@@ -4,6 +4,7 @@ import com.tcc.pdv.model.Comercio;
 import com.tcc.pdv.model.Usuario;
 import com.tcc.pdv.repository.UsuarioRepository;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,24 +33,66 @@ public class UsuarioController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @GetMapping("/filtro")
+    public ResponseEntity<List<Usuario>> filtrarUsuarios(
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String nivel_acesso,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String status,
+            HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+        Integer comercio_id = (Integer) session.getAttribute("comercioId");
+        Integer user_id = (Integer) session.getAttribute("userId");
+
+        List<Usuario> usuarios = usuarioRepository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Adiciona a condição para comercio_id
+            predicates.add(criteriaBuilder.equal(root.get("comercio").get("id"), comercio_id));
+            predicates.add(criteriaBuilder.notEqual(root.get("id"), user_id));
+
+            if (email != null && !email.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + email + "%"));
+            }
+            if (nivel_acesso != null && !nivel_acesso.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("nivelAcesso"), nivel_acesso));
+            }
+            if (nome != null && !nome.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("nome"), "%" + nome + "%"));
+            }
+            if (status != null && !status.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+
+        return ResponseEntity.ok(usuarios);
+    }
+
     @GetMapping
-    public List<Usuario> getAllUsuarios() {
-        return usuarioRepository.findAll();
+    public List<Usuario> getAllUsuarios(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        Integer comercio_id = (Integer) session.getAttribute("comercioId");
+        Integer user_id = (Integer) session.getAttribute("userId");
+        return usuarioRepository.findByComercio_idAndIdNot(comercio_id, user_id);
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> createUsuario(@RequestBody Map<String, Object> payload) {
-        int comercioId = (int) payload.get("comercioId");
+    public ResponseEntity<String> createUsuario(@RequestBody Map<String, Object> payload, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        int comercioId = (Integer) session.getAttribute("comercioId");
         String email = (String) payload.get("email");
         Usuario usuarioExistente = usuarioRepository.findByEmail(email);
         Comercio comercio = comercioRepository.findById(comercioId).orElse(null);
 
         if (comercio == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID de Comércio não cadastrado.");
         }
 
         if (usuarioExistente != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail " + email + " já cadastrado.");
         }
 
         Usuario usuario = new Usuario();
@@ -59,19 +103,29 @@ public class UsuarioController {
         usuario.setStatus((String) payload.get("status"));
         usuario.setComercio(comercio);
 
-        Usuario savedUsuario = usuarioRepository.save(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUsuario);
+        usuarioRepository.save(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário criado com sucesso.");
     }
 
-    // Método para buscar um usuário pelo ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteUsuario(@PathVariable int id) {
+        return usuarioRepository.findById(id)
+                .map(usuario -> {
+                    usuario.setStatus("INATIVO");
+                    usuarioRepository.save(usuario);
+                    return ResponseEntity.ok().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{id}")
     public Usuario getUsuarioById(@PathVariable int id) {
         return usuarioRepository.findById(id).orElse(null);
     }
 
-    // Método para login
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> verificarLoginUsuario(@RequestBody Map<String, Object> payload, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> verificarLoginUsuario(@RequestBody Map<String, Object> payload,
+            HttpServletRequest request) {
         String email = (String) payload.get("email");
         String senha = (String) payload.get("senha");
 
@@ -83,6 +137,9 @@ public class UsuarioController {
         } else if (!passwordEncoder.matches(senha, usuario.getSenha())) {
             response.put("error", "Senha incorreta.");
             return ResponseEntity.status(401).body(response);
+        } else if (!"ATIVO".equals(usuario.getStatus())) {
+            response.put("error", "Usuário inativo.");
+            return ResponseEntity.status(403).body(response);
         } else {
             HttpSession session = request.getSession();
             session.setAttribute("userId", usuario.getId());
@@ -92,28 +149,32 @@ public class UsuarioController {
         }
     }
 
-    // Método para atualizar um usuário
     @PutMapping("/{id}")
-    public Usuario updateUsuario(@PathVariable int id, @RequestBody Usuario usuarioDetails) {
+    public ResponseEntity<Usuario> updateUsuario(@PathVariable int id, @RequestBody Usuario usuarioDetails,
+            HttpServletRequest request) {
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if (usuario != null) {
             usuario.setNome(usuarioDetails.getNome());
             usuario.setEmail(usuarioDetails.getEmail());
-            usuario.setSenha(passwordEncoder.encode(usuarioDetails.getSenha()));
+            if (usuarioDetails.getSenha() != "") {
+                usuario.setSenha(passwordEncoder.encode(usuarioDetails.getSenha()));
+            } else {
+                usuario.setSenha(usuario.getSenha());
+            }
             usuario.setNivelAcesso(usuarioDetails.getNivelAcesso());
             usuario.setStatus(usuarioDetails.getStatus());
-            Comercio comercio = comercioRepository.findById(usuarioDetails.getComercio().getId()).orElse(null);
+
+            // Obter o ID do comércio da sessão do usuário atual
+            HttpSession session = request.getSession();
+            Integer comercioId = (Integer) session.getAttribute("comercioId");
+            Comercio comercio = comercioRepository.findById(comercioId).orElse(null);
             if (comercio != null) {
                 usuario.setComercio(comercio);
             }
-            return usuarioRepository.save(usuario);
-        }
-        return null;
-    }
 
-    // Método para deletar um usuário
-    @DeleteMapping("/{id}")
-    public void deleteUsuario(@PathVariable int id) {
-        usuarioRepository.deleteById(id);
+            Usuario updatedUsuario = usuarioRepository.save(usuario);
+            return ResponseEntity.ok(updatedUsuario);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 }

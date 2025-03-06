@@ -36,11 +36,15 @@ public class ProdutoController {
             @RequestParam(required = false) String imagem,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String valorFabrica,
-            @RequestParam(required = false) String valorVenda) {
-
+            @RequestParam(required = false) String valorVenda,
+            HttpServletRequest request) {
+                HttpSession session = request.getSession(false);
+                Integer comercio_id = (Integer) session.getAttribute("comercioId");
         List<Produto> produtos = produtoRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            predicates.add(criteriaBuilder.equal(root.get("comercio").get("id"), comercio_id));
+            
             if (barra != null && !barra.isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("barra").as(String.class), "%" + barra + "%"));
             }

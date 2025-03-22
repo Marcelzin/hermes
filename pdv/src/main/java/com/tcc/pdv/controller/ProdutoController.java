@@ -17,6 +17,7 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/produtos")
@@ -28,6 +29,13 @@ public class ProdutoController {
     @Autowired
     private ComercioRepository comercioRepository;
 
+    @GetMapping("/barcode/{barcode}")
+    public ResponseEntity<Produto> getProdutoByBarcode(@PathVariable long barcode) {
+        Optional<Produto> produto = produtoRepository.findByBarra(barcode);
+        return produto.map(ResponseEntity::ok)
+                      .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
     @GetMapping("/filtro")
     public ResponseEntity<List<Produto>> filtrarProdutos(
             @RequestParam(required = false) String barra,
@@ -38,8 +46,8 @@ public class ProdutoController {
             @RequestParam(required = false) String valorFabrica,
             @RequestParam(required = false) String valorVenda,
             HttpServletRequest request) {
-                HttpSession session = request.getSession(false);
-                Integer comercio_id = (Integer) session.getAttribute("comercioId");
+        HttpSession session = request.getSession(false);
+        Integer comercio_id = (Integer) session.getAttribute("comercioId");
         List<Produto> produtos = produtoRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -144,6 +152,18 @@ public class ProdutoController {
                     return ResponseEntity.ok().build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/barra/{barra}")
+    public ResponseEntity<Produto> getProdutoByBarra(@PathVariable long barra, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        Integer comercioId = (Integer) session.getAttribute("comercioId");
+        
+        Produto produto = produtoRepository.findByBarraAndComercioId(barra, comercioId);
+        if (produto != null && "ATIVO".equals(produto.getStatus())) {
+            return ResponseEntity.ok(produto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     private void setProdutoFields(Produto produto, Map<String, Object> payload) {

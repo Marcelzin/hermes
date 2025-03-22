@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface ProdutoRepository extends JpaRepository<Produto, Integer>, JpaSpecificationExecutor<Produto> {
     List<Produto> findByComercioId(Integer comercioId);
     Optional<Produto> findById(Integer id);
+    Optional<Produto> findByBarra(long barra);
+    Produto findByBarraAndComercioId(long barra, Integer comercioId);
 }

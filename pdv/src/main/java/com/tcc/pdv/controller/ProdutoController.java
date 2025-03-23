@@ -17,7 +17,6 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/produtos")
@@ -30,10 +29,18 @@ public class ProdutoController {
     private ComercioRepository comercioRepository;
 
     @GetMapping("/barcode/{barcode}")
-    public ResponseEntity<Produto> getProdutoByBarcode(@PathVariable long barcode) {
-        Optional<Produto> produto = produtoRepository.findByBarra(barcode);
-        return produto.map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    public ResponseEntity<Produto> getProdutoByBarcode(@PathVariable long barcode, HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);
+            Integer comercioId = (Integer) session.getAttribute("comercioId");
+            
+            return produtoRepository.findByBarraAndComercioIdAndStatus(barcode, comercioId, "ATIVO")
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/filtro")
@@ -156,14 +163,17 @@ public class ProdutoController {
 
     @GetMapping("/barra/{barra}")
     public ResponseEntity<Produto> getProdutoByBarra(@PathVariable long barra, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        Integer comercioId = (Integer) session.getAttribute("comercioId");
-        
-        Produto produto = produtoRepository.findByBarraAndComercioId(barra, comercioId);
-        if (produto != null && "ATIVO".equals(produto.getStatus())) {
-            return ResponseEntity.ok(produto);
+        try {
+            HttpSession session = request.getSession(false);
+            Integer comercioId = (Integer) session.getAttribute("comercioId");
+            
+            return produtoRepository.findByBarraAndComercioIdAndStatus(barra, comercioId, "ATIVO")
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     private void setProdutoFields(Produto produto, Map<String, Object> payload) {

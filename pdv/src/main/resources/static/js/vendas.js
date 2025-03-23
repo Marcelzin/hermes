@@ -88,22 +88,35 @@ function buscarEAdicionarProduto() {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Erro',
-                    text: 'Produto não encontrado!'
+                    title: 'Produto não encontrado',
+                    text: 'Nenhum produto ativo encontrado com este código de barras.'
                 });
             }
         },
-        error: function() {
+        error: function(xhr) {
+            let mensagem = 'Erro ao buscar produto!';
+            if (xhr.status === 404) {
+                mensagem = 'Produto não encontrado ou inativo.';
+            }
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
-                text: 'Erro ao buscar produto!'
+                text: mensagem
             });
         }
     });
 }
 
 function adicionarProdutoAoCarrinho(produto) {
+    if (!produto || !produto.id) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Produto inválido!'
+        });
+        return;
+    }
+
     const itemExistente = carrinho.find(item => item.produto.id === produto.id);
     
     if (itemExistente) {
@@ -117,7 +130,6 @@ function adicionarProdutoAoCarrinho(produto) {
     
     atualizarInterface();
     
-    // Feedback visual
     Swal.fire({
         icon: 'success',
         title: 'Produto adicionado!',

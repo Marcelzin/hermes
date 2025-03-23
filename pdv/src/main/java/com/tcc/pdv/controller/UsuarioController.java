@@ -81,10 +81,18 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<String> createUsuario(@RequestBody Map<String, Object> payload, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        int comercioId = (Integer) session.getAttribute("comercioId");
         String email = (String) payload.get("email");
         Usuario usuarioExistente = usuarioRepository.findByEmail(email);
+        
+        // Tenta pegar o comercioId do payload, se não existir pega da sessão
+        Integer comercioId = (Integer) payload.get("comercioId");
+        if (comercioId == null) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                comercioId = (Integer) session.getAttribute("comercioId");
+            }
+        }
+        
         Comercio comercio = comercioRepository.findById(comercioId).orElse(null);
 
         if (comercio == null) {
@@ -156,11 +164,13 @@ public class UsuarioController {
         if (usuario != null) {
             usuario.setNome(usuarioDetails.getNome());
             usuario.setEmail(usuarioDetails.getEmail());
-            if (usuarioDetails.getSenha() != "") {
-                usuario.setSenha(passwordEncoder.encode(usuarioDetails.getSenha()));
-            } else {
-                usuario.setSenha(usuario.getSenha());
+            
+            // Verifica se a senha foi enviada e não está vazia
+            String novaSenha = usuarioDetails.getSenha();
+            if (novaSenha != null && !novaSenha.trim().isEmpty()) {
+                usuario.setSenha(passwordEncoder.encode(novaSenha));
             }
+            
             usuario.setNivelAcesso(usuarioDetails.getNivelAcesso());
             usuario.setStatus(usuarioDetails.getStatus());
 

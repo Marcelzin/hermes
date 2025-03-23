@@ -1,4 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
     "workbench.tree.indent": 14,
+    "java.compile.nullAnalysis.mode": "automatic",
 }

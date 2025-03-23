@@ -39,6 +39,9 @@ public class Produto {
 
     private String status;
 
+    @Column(name = "quantidade")
+    private Integer quantidade = 0;
+
     public int getId() {
         return id;
     }
@@ -109,5 +112,13 @@ public class Produto {
 
     public void setBarra(long barra) {
         this.barra = barra;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade != null ? quantidade : 0;
+    }
+
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
     }
 }

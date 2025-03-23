@@ -55,7 +55,7 @@ function salvarUsuario() {
         email: document.getElementById('email').value,
         senha: document.getElementById('senha').value,
         nivelAcesso: document.getElementById('nivelAcesso').value,
-        status: document.getElementById('status').value,
+        status: "ATIVO"
     };
 
     $.ajax({

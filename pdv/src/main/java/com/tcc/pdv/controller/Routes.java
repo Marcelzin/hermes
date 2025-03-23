@@ -64,4 +64,9 @@ public class Routes {
         }
         return "redirect:/login";
     }
+
+    @GetMapping("/formas-pagamento")
+    public String showFormasPagamento() {
+        return "formas-pagamento";
+    }
 }

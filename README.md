@@ -88,12 +88,3 @@ hermes/
 ## 📄 Licença
 
 Este projeto está sob a licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
-
-## 🎁 Agradecimentos
-
-* Professor orientador
-* Colegas de equipe
-* Comunidade open source
-
----
-⌨️ com ❤️ por [Marcel](https://github.com/Marcelzin) 😊
